@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Escuta GPECSS</title>
+<meta name="description" content="Transforme textos em áudio acessível, gratuito e sem enviar nada para a internet.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="estilo.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/lamejs/1.2.1/lame.min.js" defer></script>
+</head>
+<body>
+<a class="pular" href="#principal">Ir para o conteúdo</a>
+<header class="topo">
+  <div class="topo-in">
+    <div class="marca" aria-hidden="true">
+      <svg viewBox="0 0 48 48" width="44" height="44"><circle cx="24" cy="24" r="23" fill="var(--vinho)"/><path d="M15 20v8M20 15v18M25 11v26M30 16v16M35 21v6" stroke="var(--dourado)" stroke-width="3" stroke-linecap="round"/></svg>
+    </div>
+    <div>
+      <h1>Escuta GPECSS</h1>
+      <p class="sub">Transforme textos em áudio acessível. Grátis, e o seu texto nunca sai do seu computador.</p>
+    </div>
+  </div>
+</header>
+
+<main id="principal">
+  <section class="cartao" aria-labelledby="t1">
+    <h2 id="t1"><span class="num">1</span> Coloque o texto</h2>
+    <label class="soltar" id="soltar" tabindex="0">
+      <input type="file" id="arquivo" accept=".pdf,.docx,.txt,.md,.html,.htm" hidden>
+      <span class="soltar-icone" aria-hidden="true">⇩</span>
+      <strong>Solte aqui o seu arquivo</strong>
+      <span>ou clique para escolher (PDF, Word .docx, TXT, Markdown ou HTML)</span>
+    </label>
+    <details class="colar">
+      <summary>Prefiro colar o texto</summary>
+      <label for="textoColado" class="vh">Texto para transformar em áudio</label>
+      <textarea id="textoColado" rows="8" placeholder="Cole o texto aqui…"></textarea>
+      <button class="btn" id="usarColado" type="button">Usar este texto</button>
+    </details>
+    <p id="arquivoNome" class="nota" aria-live="polite"></p>
+  </section>
+
+  <section class="cartao" aria-labelledby="t2">
+    <h2 id="t2"><span class="num">2</span> Escolha o jeito da voz</h2>
+    <div class="presets" role="radiogroup" aria-label="Estilos prontos" id="presets"></div>
+    <details class="ajustes" id="ajustesBox">
+      <summary>Ajustes finos</summary>
+      <div class="grade">
+        <div class="ctl"><label for="vel">Velocidade <output id="velO"></output></label><input type="range" id="vel" min="0.7" max="1.4" step="0.05"></div>
+        <div class="ctl"><label for="tom">Tom da voz <output id="tomO"></output></label><input type="range" id="tom" min="0.88" max="1.12" step="0.01"></div>
+        <div class="ctl"><label for="expr">Expressividade <output id="exprO"></output></label><input type="range" id="expr" min="0.3" max="0.95" step="0.05"></div>
+        <div class="ctl"><label for="ritmo">Variação do ritmo <output id="ritmoO"></output></label><input type="range" id="ritmo" min="0.3" max="1.2" step="0.05"></div>
+        <div class="ctl"><label for="pausas">Pausas <output id="pausasO"></output></label><input type="range" id="pausas" min="0.5" max="2" step="0.1"></div>
+        <div class="ctl"><label for="corpo">Corpo (graves) <output id="corpoO"></output></label><input type="range" id="corpo" min="0" max="7" step="0.5"></div>
+        <div class="ctl"><label for="clareza">Clareza <output id="clarezaO"></output></label><input type="range" id="clareza" min="-3" max="6" step="0.5"></div>
+        <div class="ctl"><label for="ambiente">Ambiente <output id="ambienteO"></output></label><input type="range" id="ambiente" min="0" max="0.25" step="0.01"></div>
+        <label class="chk"><input type="checkbox" id="uniforme"> Volume uniforme (evita partes baixas ou altas demais)</label>
+      </div>
+      <h3>Como adaptar o texto</h3>
+      <div class="grade">
+        <label class="chk"><input type="checkbox" id="pularReferencias"> Não ler as referências bibliográficas</label>
+        <label class="chk"><input type="checkbox" id="avisarTabelas"> Avisar quando houver tabela</label>
+        <label class="chk"><input type="checkbox" id="lerLegendas"> Ler legendas de figuras e quadros</label>
+        <div class="ctl"><label for="citacoes">Citações entre parênteses</label>
+          <select id="citacoes"><option value="curta">Ler autor e ano</option><option value="completa">Ler completas (com página)</option><option value="omitir">Não ler</option></select></div>
+        <div class="ctl"><label for="links">Endereços da internet</label>
+          <select id="links"><option value="dominio">Dizer só o site (ex.: “link para gov ponto br”)</option><option value="omitir">Não ler</option></select></div>
+      </div>
+      <div class="ctl largo">
+        <label for="pronuncias">Pronúncias (uma por linha, no formato <code>SIGLA = como falar</code>)</label>
+        <textarea id="pronuncias" rows="6" spellcheck="false"></textarea>
+        <button class="btn link" id="restaurarPron" type="button">Restaurar pronúncias padrão</button>
+      </div>
+    </details>
+    <div class="acoes">
+      <button class="btn sec" id="previa" type="button">▶ Ouvir uma prévia</button>
+      <button class="btn" id="gerar" type="button" disabled>Gerar áudio</button>
+    </div>
+  </section>
+
+  <section class="cartao" aria-labelledby="t3" id="secResultado">
+    <h2 id="t3"><span class="num">3</span> Ouça e baixe</h2>
+    <div id="status" class="status" role="status" aria-live="polite">Assim que você colocar um texto, o áudio começa a ser preparado.</div>
+    <div class="barra" aria-hidden="true"><div id="barraIn"></div></div>
+    <div id="resultado" hidden>
+      <audio id="player" controls preload="auto"></audio>
+      <div class="acoes">
+        <a class="btn" id="baixarMp3" download>⬇ Baixar MP3</a>
+        <a class="btn sec" id="baixarTxt" download>Baixar o texto adaptado</a>
+        <button class="btn link" id="reaplicar" type="button" hidden>Aplicar os ajustes novos</button>
+      </div>
+      <p class="nota">Clique numa frase abaixo para ouvir a partir dela.</p>
+    </div>
+    <div id="leitura" class="leitura" aria-label="Texto adaptado"></div>
+  </section>
+
+  <section class="cartao info">
+    <h2>Como funciona</h2>
+    <ul>
+      <li><strong>Adaptação:</strong> a ferramenta tira símbolos, emojis, números de página, marcas de nota e endereços longos. Também transforma abreviaturas, datas, porcentagens e siglas em fala natural.</li>
+      <li><strong>Voz:</strong> usa a voz neural “Faber”, do projeto aberto Piper. Na primeira vez ela é baixada (cerca de 63 MB) e fica guardada no navegador.</li>
+      <li><strong>Privacidade:</strong> todo o processamento acontece no seu aparelho. Nenhum texto é enviado para servidores.</li>
+      <li><strong>Lapidação:</strong> antes de virar MP3, o áudio passa por ajustes de estúdio, como volume uniforme, graves, clareza e ambiente.</li>
+    </ul>
+  </section>
+</main>
+<footer class="rodape">GPECSS · Ferramenta de acessibilidade · Voz Piper “Faber” (licença aberta)</footer>
+<script type="module" src="js/app.js"></script>
+</body>
+</html>
